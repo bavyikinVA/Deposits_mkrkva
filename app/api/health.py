@@ -9,6 +9,12 @@ router = APIRouter(tags=["health"])
 
 @router.get("/health")
 async def health(session: AsyncSession = Depends(get_session)):
-    # проверяем реальное соединение с БД
-    await session.execute(text("SELECT 1"))
-    return {"status": "ok"}
+    try:
+        await session.execute(text("SELECT 1"))
+        return {"status": "ok", "database": "connected"}
+    except Exception as exc:
+        return {
+            "status": "error",
+            "database": "disconnected",
+            "details": str(exc),
+        }

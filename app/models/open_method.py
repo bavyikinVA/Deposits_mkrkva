@@ -9,7 +9,7 @@ from app.core.database import Base
 
 if TYPE_CHECKING:
     from app.models.deposit_variant import DepositVariant
-
+    from app.models.deposit_base_rate import DepositBaseRate
 
 class DepositOpenMethod(Base):
     __tablename__ = "deposit_open_methods"
@@ -23,6 +23,7 @@ class DepositOpenMethod(Base):
         back_populates="open_method",
         cascade="all, delete-orphan",
     )
+    base_rates: Mapped[list["DepositBaseRate"]] = relationship(back_populates="open_method", )
 
 
 class DepositVariantOpenMethod(Base):

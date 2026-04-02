@@ -8,10 +8,10 @@ from sqlalchemy import CheckConstraint, Date, ForeignKey, Index, Numeric, Unique
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
-
 if TYPE_CHECKING:
     from app.models.deposit_variant import DepositVariant
-
+    from app.models.deposit_interest_scheme import DepositInterestScheme
+    from app.models.open_method import DepositOpenMethod
 
 class DepositBaseRate(Base):
     __tablename__ = "deposit_base_rates"
@@ -90,3 +90,4 @@ class DepositBaseRate(Base):
 
     variant: Mapped["DepositVariant"] = relationship(back_populates="base_rates")
     interest_scheme: Mapped["DepositInterestScheme | None"] = relationship(back_populates="base_rates")
+    open_method: Mapped["DepositOpenMethod | None"] = relationship(back_populates="base_rates")
