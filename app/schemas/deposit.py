@@ -95,6 +95,11 @@ class DepositsPage(ORMBase):
     page: int
     page_size: int
 
+class DepositsStatsOut(ORMBase):
+    total_offers: int
+    total_banks: int
+    topup_offers: int
+    capitalization_offers: int
 
 class DepositSearchParams(BaseModel):
     amount: Decimal | None = Field(default=None, gt=0)

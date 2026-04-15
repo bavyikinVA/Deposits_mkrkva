@@ -1,0 +1,100 @@
+:root {
+    --bg: #f5fbff;
+    --surface: #ffffff;
+    --surface-soft: #eef8fd;
+    --primary: #99d0ee;
+    --primary-deep: #4da8d8;
+    --text: #1d2a33;
+    --text-soft: #58717f;
+    --border: #d9edf8;
+    --success: #1fa971;
+    --shadow: 0 12px 40px rgba(70, 120, 150, 0.12);
+    --radius-lg: 24px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
+    --container: 1200px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+    margin: 0;
+    min-height: 100%;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+    background: linear-gradient(180deg, #ffffff 0%, #f5fbff 100%);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+.container {
+    width: min(var(--container), calc(100% - 32px));
+    margin: 0 auto;
+}
+
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+}
+
+.section-title {
+    font-size: 32px;
+    font-weight: 800;
+    margin: 0 0 10px;
+}
+
+.section-subtitle {
+    margin: 0;
+    color: var(--text-soft);
+    line-height: 1.6;
+}
+
+.btn {
+    border: none;
+    border-radius: 999px;
+    padding: 14px 22px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
+    color: #fff;
+    font-weight: 700;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: var(--surface-soft);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.grid {
+    display: grid;
+    gap: 20px;
+}
+
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 26px;
+    }
+}
