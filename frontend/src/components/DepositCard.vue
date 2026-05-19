@@ -317,20 +317,24 @@ function selectVariant() {
 .deposit__bank {
   color: var(--primary-deep);
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   margin-bottom: 8px;
 }
 
 .deposit h3 {
   margin: 0 0 8px;
   font-size: 24px;
-  line-height: 1.2;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.035em;
 }
 
 .deposit__description {
   margin: 0;
   color: var(--text-soft);
-  line-height: 1.5;
+  font-weight: 500;
+  line-height: 1.55;
 }
 
 .deposit__features {
@@ -347,7 +351,8 @@ function selectVariant() {
   border: 1px solid var(--border);
   color: var(--text-soft);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .deposit__feature.is-active {
@@ -373,11 +378,15 @@ function selectVariant() {
   color: var(--text-soft);
   margin-bottom: 6px;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .deposit__metric strong {
   font-size: 16px;
-  line-height: 1.4;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 .deposit__footer {
@@ -391,6 +400,7 @@ function selectVariant() {
 .deposit__hint {
   color: var(--text-soft);
   font-size: 14px;
+  font-weight: 500;
 }
 
 .deposit__actions {

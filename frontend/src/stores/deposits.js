@@ -34,7 +34,9 @@ export const useDepositsStore = defineStore('deposits', {
 
         filters: {
             amount: 50000,
-            term_days: 367,
+            // Срок по умолчанию не задаём: каталог не должен отсеивать вклады
+            // из-за условных 367/365/360 дней до выбора пользователя.
+            term_days: null,
             currency: 'RUB',
             capitalization_enabled: null,
             allow_topup: null,
@@ -115,7 +117,15 @@ export const useDepositsStore = defineStore('deposits', {
         async loadVariantById(variantId) {
             if (!variantId) return
 
-            if (this.selectedVariant && Number(this.selectedVariant.id) === Number(variantId)) {
+            const hasFullSelectedVariant =
+                this.selectedVariant &&
+                Number(this.selectedVariant.id) === Number(variantId) &&
+                Array.isArray(this.selectedVariant.base_rates) &&
+                this.selectedVariant.base_rates.length > 0
+
+            // Карточка из каталога содержит краткую модель без base_rates.
+            // Для калькулятора всегда нужна полная карточка с /api/deposits/{id}.
+            if (hasFullSelectedVariant) {
                 return
             }
 

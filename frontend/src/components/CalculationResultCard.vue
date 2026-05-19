@@ -109,12 +109,17 @@ const capitalizationFrequencyLabel = computed(() => {
 
 .result__label {
   color: var(--text-soft);
+  font-weight: 500;
   margin-bottom: 8px;
 }
 
 .result h3 {
   margin: 0;
   font-size: 28px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 .result__grid {
@@ -126,11 +131,15 @@ const capitalizationFrequencyLabel = computed(() => {
 .result__grid span {
   display: block;
   color: var(--text-soft);
+  font-weight: 500;
   margin-bottom: 6px;
 }
 
 .result__grid strong {
   font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 .result__meta {
@@ -139,6 +148,7 @@ const capitalizationFrequencyLabel = computed(() => {
   gap: 14px;
   margin-top: 18px;
   color: var(--text-soft);
+  font-weight: 500;
 }
 
 @media (max-width: 640px) {

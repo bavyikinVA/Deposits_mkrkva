@@ -188,8 +188,38 @@ def select_best_base_rate(
         candidates.append(rate)
 
     if not candidates:
+        available_terms = sorted(
+            {
+                (rate.term_from_days, rate.term_to_days)
+                for rate in variant.base_rates
+                if _date_matches(ctx.as_of, rate.effective_from, rate.effective_to)
+                and ctx.amount >= rate.amount_from
+                and (rate.amount_to is None or ctx.amount <= rate.amount_to)
+                and (
+                    selected_open_method_id is None
+                    or rate.open_method_id in (None, selected_open_method_id)
+                )
+                and (
+                    selected_scheme_id is None
+                    or rate.interest_scheme_id in (None, selected_scheme_id)
+                )
+            }
+        )
+
+        if available_terms:
+            terms_hint = ", ".join(
+                str(start) if start == end else f"{start}–{end}"
+                for start, end in available_terms[:12]
+            )
+            raise DepositCalculationError(
+                "Не найдена подходящая базовая ставка для указанного срока. "
+                f"Выбран срок: {ctx.term_days} дн. "
+                f"Доступные сроки для этой суммы: {terms_hint} дн."
+            )
+
         raise DepositCalculationError(
-            "Не найдена подходящая базовая ставка для указанных параметров"
+            "Не найдена подходящая базовая ставка для указанных параметров. "
+            "Проверьте сумму, срок, дату расчёта, способ открытия и схему начисления."
         )
 
     candidates.sort(

@@ -2,9 +2,6 @@
   <section class="container home-stats">
     <div class="home-stats__head">
       <h2 class="section-title">Статистика по базе</h2>
-      <p class="section-subtitle">
-        Краткая сводка по доступным предложениям вкладов.
-      </p>
     </div>
 
     <div class="home-stats__grid">
@@ -64,6 +61,7 @@ defineProps({
   display: block;
   color: var(--text-soft);
   font-size: 14px;
+  font-weight: 600;
   margin-bottom: 10px;
 }
 
@@ -71,7 +69,9 @@ defineProps({
   display: block;
   font-size: 32px;
   font-weight: 800;
-  line-height: 1.1;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums lining-nums;
   color: var(--text);
 }
 

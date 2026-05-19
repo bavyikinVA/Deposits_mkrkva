@@ -39,14 +39,17 @@ import { RouterLink } from 'vue-router'
 .hero h1 {
   margin: 0 0 14px;
   font-size: 44px;
-  line-height: 1.1;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
 }
 
 .hero p {
   margin: 0;
   font-size: 18px;
+  font-weight: 500;
   color: var(--text-soft);
-  line-height: 1.6;
+  line-height: 1.65;
   max-width: 640px;
 }
 

@@ -31,7 +31,8 @@ defineEmits(['update:modelValue'])
 .field__label {
   font-size: 14px;
   color: var(--text-soft);
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .field__control {
@@ -41,5 +42,19 @@ defineEmits(['update:modelValue'])
   border: 1px solid var(--border);
   padding: 0 16px;
   background: #fff;
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.field__control:focus {
+  outline: none;
+  border-color: var(--primary-deep);
+  box-shadow: 0 0 0 4px rgba(153, 208, 238, 0.28);
+}
+
+.field__control::placeholder {
+  color: #8aa3af;
+  font-weight: 500;
 }
 </style>

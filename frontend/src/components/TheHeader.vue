@@ -59,10 +59,13 @@ import { RouterLink } from 'vue-router'
 .header__title {
   font-size: 18px;
   font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
 }
 
 .header__caption {
   font-size: 12px;
+  font-weight: 500;
   color: var(--text-soft);
 }
 
@@ -74,7 +77,8 @@ import { RouterLink } from 'vue-router'
 
 .header__link {
   color: var(--text-soft);
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .header__link.router-link-active {

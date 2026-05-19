@@ -73,11 +73,12 @@ const currencyOptions = [
 
 const termOptions = [
   { value: '', label: 'Не важно' },
-  { value: '31', label: '31 день' },
-  { value: '91', label: '3 месяца (91 день)' },
-  { value: '181', label: '6 месяцев (181 день)' },
-  { value: '367', label: '1 год (367 дней)' },
-  { value: '548', label: '1.5 года (548 дней)' },
+  { value: '30', label: '1 месяц (30 дней)' },
+  { value: '60', label: '2 месяца (60 дней)' },
+  { value: '90', label: '3 месяца (90 дней)' },
+  { value: '180', label: '6 месяцев (180 дней)' },
+  { value: '360', label: '1 год (360 дней)' },
+  { value: '540', label: '1,5 года (540 дней)' },
   { value: '730', label: '2 года (730 дней)' },
   { value: '1095', label: '3 года (1095 дней)' }
 ]
@@ -148,8 +149,8 @@ function submit() {
 
 function reset() {
   const payload = {
-    amount: 300000,
-    term_days: 367,
+    amount: 50000,
+    term_days: null,
     currency: 'RUB',
     capitalization_enabled: null,
     allow_topup: null,

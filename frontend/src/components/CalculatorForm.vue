@@ -127,11 +127,11 @@ const maxAmountLabel = computed(() => {
 })
 
 const minTermLabel = computed(() => {
-  return minTermDays.value ? `${minTermDays.value} дн.` : '—'
+  return minTermDays.value ? formatDaysLabel(minTermDays.value) : '—'
 })
 
 const maxTermLabel = computed(() => {
-  return maxTermDays.value ? `${maxTermDays.value} дн.` : '—'
+  return maxTermDays.value ? formatDaysLabel(maxTermDays.value) : '—'
 })
 
 const selectedMetaLabel = computed(() => {
@@ -157,12 +157,6 @@ function formatMoneyWithCurrency(value, currencyCode) {
     maximumFractionDigits: 2,
     minimumFractionDigits: amount % 1 === 0 ? 0 : 2
   }).format(amount)} ${currencyCode}`
-}
-
-function monthsLabel(months) {
-  if (months === 1) return '1 месяц'
-  if (months >= 2 && months <= 4) return `${months} месяца`
-  return `${months} месяцев`
 }
 
 function payoutShortLabel(code) {
@@ -198,7 +192,8 @@ function openMethodLabel(method) {
     branch: 'В отделении банка',
     mobile_app: 'В мобильном приложении',
     internet_bank: 'В интернет-банке',
-    gosuslugi: 'Через Госуслуги'
+    gosuslugi: 'Через Госуслуги',
+    out_of_office_worker: 'Работник банка вне офиса'
   }
 
   return map[method.code] || method.code || 'Не указано'
@@ -217,110 +212,140 @@ function dedupeByValue(items) {
   return [...map.values()]
 }
 
-function representativeDaysForMonths(months, minDays, maxDays) {
-  const special = {
-    4: 120,
-    5: 150,
-    6: 181,
-    7: 212,
-    8: 243,
-    9: 273,
-    10: 304,
-    11: 334,
-    12: 367,
-    18: 548,
-    24: 730,
-    36: 1095
-  }
-
-  let value = special[months] || Math.round(months * 30.4)
-
-  if (value < minDays) value = minDays
-  if (maxDays && value > maxDays) value = maxDays
-
-  return value
+function currentAmount() {
+  const amount = Number(form.amount)
+  if (Number.isFinite(amount) && amount > 0) return amount
+  return Number(props.variant?.min_amount || 0)
 }
 
-function buildMonthCandidates(minDays, maxDays) {
-  const candidates = []
-  const minMonths = Math.max(1, Math.ceil(minDays / 30))
-  const maxMonths = Math.max(minMonths, Math.floor(maxDays / 30))
+function rateMatchesAmount(rate) {
+  const amount = currentAmount()
+  if (!amount) return true
 
-  for (let month = minMonths; month <= Math.min(maxMonths, 12); month += 1) {
-    candidates.push(month)
+  const from = Number(rate.amount_from || 0)
+  const to = rate.amount_to == null ? null : Number(rate.amount_to)
+
+  return amount >= from && (to == null || amount <= to)
+}
+
+function rateMatchesSelectedMethod(rate) {
+  if (!form.open_method_code) return true
+
+  // null в ставке означает универсальную ставку для любого способа открытия.
+  if (!rate.open_method_id && !rate.open_method?.code) return true
+
+  return rate.open_method?.code === form.open_method_code
+}
+
+function rateMatchesSelectedScheme(rate) {
+  if (!form.interest_scheme_code) return true
+
+  // null в ставке означает универсальную ставку для любой схемы начисления.
+  if (!rate.interest_scheme_id && !rate.interest_scheme?.code) return true
+
+  return rate.interest_scheme?.code === form.interest_scheme_code
+}
+
+function getRateFromDays(rate) {
+  return Number(rate.term_from_days || 0)
+}
+
+function getRateToDays(rate) {
+  return Number(rate.term_to_days || rate.term_from_days || 0)
+}
+
+function formatDaysLabel(days) {
+  const value = Number(days)
+
+  const known = {
+    30: '1 месяц',
+    31: '1 месяц',
+    60: '2 месяца',
+    61: '2 месяца',
+    90: '3 месяца',
+    91: '3 месяца',
+    120: '4 месяца',
+    150: '5 месяцев',
+    180: '6 месяцев',
+    181: '6 месяцев',
+    182: '6 месяцев',
+    183: '6 месяцев',
+    210: '7 месяцев',
+    212: '7 месяцев',
+    240: '8 месяцев',
+    243: '8 месяцев',
+    270: '9 месяцев',
+    273: '9 месяцев',
+    300: '10 месяцев',
+    304: '10 месяцев',
+    330: '11 месяцев',
+    334: '11 месяцев',
+    360: '1 год',
+    365: '1 год',
+    367: '1 год',
+    390: '13 месяцев',
+    510: '17 месяцев',
+    540: '1,5 года',
+    548: '1,5 года',
+    730: '2 года',
+    1095: '3 года'
   }
 
-  if (maxMonths >= 18) candidates.push(18)
-  if (maxMonths >= 24) candidates.push(24)
-  if (maxMonths >= 36) candidates.push(36)
+  return known[value] || `${value} дн.`
+}
 
-  return [...new Set(candidates)].sort((a, b) => a - b)
+function termLabel(from, to) {
+  if (Number(from) === Number(to)) {
+    return `${formatDaysLabel(from)} (${from} дн.)`
+  }
+
+  return `${formatDaysLabel(from)} — ${formatDaysLabel(to)} (${from}–${to} дн.)`
 }
 
 function buildTermOptions(baseRates, variant) {
   if (!variant) return []
 
-  const minDays = Number(variant.min_term_days || 0)
-  const maxDays = Number(variant.max_term_days || minDays || 0)
+  const rates = (baseRates || [])
+    .map((rate) => ({
+      from: getRateFromDays(rate),
+      to: getRateToDays(rate)
+    }))
+    .filter((rate) => rate.from > 0 && rate.to >= rate.from)
+    .sort((a, b) => a.from - b.from || a.to - b.to)
 
-  const usableRates = (baseRates || []).length
-    ? baseRates
-    : [{ term_from_days: minDays, term_to_days: maxDays }]
-
-  const monthCandidates = buildMonthCandidates(minDays, maxDays)
-
-  const options = monthCandidates
-    .map((months) => {
-      const dayValue = representativeDaysForMonths(months, minDays, maxDays)
-
-      const allowed = usableRates.some((rate) => {
-        const from = Number(rate.term_from_days || 0)
-        const to = Number(rate.term_to_days || 0)
-        return dayValue >= from && dayValue <= to
-      })
-
-      if (!allowed) return null
-
-      let label
-
-      if (months === 12) {
-        label = '1 год'
-      } else if (months === 18) {
-        label = '1,5 года'
-      } else if (months === 24) {
-        label = '2 года'
-      } else if (months === 36) {
-        label = '3 года'
-      } else {
-        label = monthsLabel(months)
-      }
-
-      return {
-        value: String(dayValue),
-        label
-      }
-    })
-    .filter(Boolean)
-
-  const fallbackMin = {
-    value: String(minDays),
-    label: `${minDays} дн.`
+  if (!rates.length) {
+    const fallback = Number(variant.min_term_days || 0)
+    return fallback ? [{ value: String(fallback), label: `${formatDaysLabel(fallback)} (${fallback} дн.)` }] : []
   }
 
-  return dedupeByValue(options.length ? options : [fallbackMin])
+  const optionsByRange = new Map()
+
+  rates.forEach((rate) => {
+    const key = `${rate.from}-${rate.to}`
+    if (!optionsByRange.has(key)) {
+      optionsByRange.set(key, {
+        value: String(rate.from),
+        label: termLabel(rate.from, rate.to),
+        from: rate.from,
+        to: rate.to
+      })
+    }
+  })
+
+  return [...optionsByRange.values()]
+    .sort((a, b) => a.from - b.from || a.to - b.to)
+    .map(({ value, label }) => ({ value, label }))
 }
 
 const filteredRatesByMethodAndScheme = computed(() => {
   const rates = props.variant?.base_rates || []
 
   return rates.filter((rate) => {
-    const methodCode = rate.open_method?.code || ''
-    const schemeCode = rate.interest_scheme?.code || ''
-
-    const methodOk = !form.open_method_code || methodCode === form.open_method_code
-    const schemeOk = !form.interest_scheme_code || schemeCode === form.interest_scheme_code
-
-    return methodOk && schemeOk
+    return (
+      rateMatchesAmount(rate) &&
+      rateMatchesSelectedMethod(rate) &&
+      rateMatchesSelectedScheme(rate)
+    )
   })
 })
 
@@ -365,10 +390,7 @@ const interestSchemeOptions = computed(() => {
 
   return options.length ? options : [{ value: '', label: 'Не указано' }]
 })
-computed(() => {
-  const schemes = props.variant?.interest_schemes || []
-  return schemes.find((scheme) => scheme.code === form.interest_scheme_code) || null
-});
+
 const termOptions = computed(() => {
   return buildTermOptions(filteredRatesByMethodAndScheme.value, props.variant)
 })
@@ -380,6 +402,18 @@ const termValue = computed({
   }
 })
 
+function chooseDefaultScheme(variant) {
+  const schemes = variant?.interest_schemes || []
+  const capitalized = schemes.find((scheme) => scheme?.capitalization_enabled === true)
+  const firstFromOptions = interestSchemeOptions.value[0]?.value || ''
+  return capitalized?.code || firstFromOptions
+}
+
+function setFirstAvailableTerm() {
+  const firstTerm = termOptions.value[0]?.value
+  form.term_days = firstTerm ? Number(firstTerm) : Number(props.variant?.min_term_days || 0)
+}
+
 watch(
   () => props.variant,
   (variant) => {
@@ -387,21 +421,14 @@ watch(
 
     form.amount = Number(variant.min_amount || 0)
     form.open_method_code = openMethodOptions.value[0]?.value || ''
-
-    const preferredScheme = (variant.interest_schemes || []).find(
-      (scheme) => scheme?.capitalization_enabled === true
-    )
-
-    form.interest_scheme_code = preferredScheme?.code || interestSchemeOptions.value[0]?.value || ''
-    form.term_days = termOptions.value[0]?.value
-      ? Number(termOptions.value[0].value)
-      : Number(variant.min_term_days || 0)
+    form.interest_scheme_code = chooseDefaultScheme(variant)
+    setFirstAvailableTerm()
   },
   { immediate: true }
 )
 
 watch(
-  () => [form.open_method_code, form.interest_scheme_code],
+  () => [form.open_method_code, form.interest_scheme_code, form.amount],
   () => {
     const availableTerms = termOptions.value
     if (!availableTerms.length) return
@@ -418,8 +445,8 @@ watch(
 const isReadyToSubmit = computed(() => {
   return Boolean(
     props.variant &&
-    form.amount &&
-    form.term_days
+    Number(form.amount) > 0 &&
+    Number(form.term_days) > 0
   )
 })
 
@@ -464,12 +491,15 @@ function submit() {
 .calculator__selected-title {
   color: var(--text-soft);
   font-size: 13px;
+  font-weight: 600;
   margin-bottom: 6px;
 }
 
 .calculator__selected-name {
   font-weight: 800;
   font-size: 18px;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
   margin-bottom: 6px;
 }
 
@@ -480,6 +510,7 @@ function submit() {
   background: #fbfeff;
   border: 1px solid var(--border);
   color: var(--text-soft);
+  font-weight: 500;
 }
 
 .calculator__grid {
