@@ -29,7 +29,7 @@
 - Быстрый переход к каталогу и калькулятору
 - Статистика по базе вкладов
 
-<img width="1763" height="1121" alt="main" src="https://github.com/user-attachments/assets/3e8628cd-a296-4dc2-8d87-fe8e6784d45c" />
+<p><img src="assets/homepage.gif" alt="Демонстрация главной страницы" width="1200"/></p>
 
 ---
 
